@@ -44,7 +44,7 @@ async function ReportMeshData() {
             let PreviousMeshEvent = BeforeData[TrackedMeshEventName];
             if(PreviousMeshEvent) {
                 if(PreviousMeshEvent.metadataStructData.bHasCompleted != MeshEvent.metadataStructData.bHasCompleted && MeshEvent.metadataStructData.bHasCompleted == true) {
-                    Report.content = "<@&1483163455098851430>";
+                    Report.content = `<@&${process.env.PingRoleId}>`;
                 }
             }
         }

@@ -13,7 +13,7 @@ fastify.get('/metrics',async function handler (request, reply) {
 });
 
 async function StartServer() {
-    await fastify.listen({ port: process.env.SERVER_PORT || 3000 });
+    await fastify.listen({ port: process.env.SERVER_PORT || 3000, host: '0.0.0.0' });
 }
 
 StartServer();

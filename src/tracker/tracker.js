@@ -21,7 +21,7 @@ async function ReportMeshData() {
 
         if(MeshEvent) {
             Report.embeds.push({
-                title: `${MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] ? MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] : TrackedMeshEventName}`,
+                title: TrackedMeshEventName,
                 description: `**${MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] ? MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] : TrackedMeshEventName}**`,
                 color: MeshNetworkedEventsTrackedColors[TrackedMeshEventName] ? MeshNetworkedEventsTrackedColors[TrackedMeshEventName] : 4522140,
                 fields: [

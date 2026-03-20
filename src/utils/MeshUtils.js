@@ -22,7 +22,7 @@ async function GetMeshNetworkMetadata() {
 async function ParseRealNamesDict() {
     let Dict = {};
 
-    if(process.env.MeshEventTrackNameToRealName == '') {
+    if(!process.env.MeshEventTrackNameToRealName || process.env.MeshEventTrackNameToRealName == '') {
         return Dict;
     }
 
@@ -39,12 +39,12 @@ async function ParseRealNamesDict() {
 async function ParseColorsDict() {
     let Dict = {};
 
-    if(process.env.MeshEventTrackNameToColor == '') {
+    if(!process.env.MeshEventTrackNameToColor || process.env.MeshEventTrackNameToColor == '') {
         return Dict;
     }
 
-    let MeshNetworkdEventsTrackedRealNames = process.env.MeshEventTrackNameToColor.split(',');
-    for(let TrackedRealName of MeshNetworkdEventsTrackedRealNames) {
+    let MeshEventTrackNameToColor = process.env.MeshEventTrackNameToColor.split(',');
+    for(let TrackedRealName of MeshEventTrackNameToColor) {
         let MeshEventId = TrackedRealName.split(":")[0];
         let Color = TrackedRealName.split(":")[1];
         Dict[MeshEventId] = parseInt(Color);

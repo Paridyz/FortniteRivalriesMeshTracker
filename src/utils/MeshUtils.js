@@ -15,7 +15,6 @@ function FormatUrl(Url, Args) {
 /* Get the current mesh networked event metadata from the public Fortnite mesh service */
 async function GetMeshNetworkMetadata() {
     let MeshNetworkMetadataUrl = GetMeshNetworkMetadataUrl();
-    console.log(MeshNetworkMetadataUrl);
     let response = await axios.get(MeshNetworkMetadataUrl);
     return response.data;
 }

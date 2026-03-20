@@ -5,3 +5,5 @@ const { ReportMeshData } = require('./src/tracker/tracker');
 
 ReportMeshData();
 setInterval(ReportMeshData, 5000);
+
+require('./src/webserver/server');

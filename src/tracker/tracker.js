@@ -1,5 +1,5 @@
 let DiscordWebhook = require('../discord/DiscordWebhookSender');
-const { GetMeshNetworkMetadata, ParseRealNamesDict, ParseColorsDict } = require('../utils/MeshUtils');
+const { GetMeshNetworkMetadata, GetDataAsDict } = require('../utils/MeshUtils');
 
 let BeforeData = {};
 
@@ -7,8 +7,8 @@ let BeforeData = {};
 async function ReportMeshData() {
     let MeshData = await GetMeshNetworkMetadata();
     let MeshnetworkedEventsToTrack = process.env.MeshEventsToTrack.split(',');
-    let MeshNetworkdEventsTrackedRealNames = await ParseRealNamesDict();
-    let MeshNetworkedEventsTrackedColors = await ParseColorsDict();
+    let MeshNetworkdEventsTrackedRealNames = GetDataAsDict(process.env.MeshEventTrackNameToRealName);
+    let MeshNetworkedEventsTrackedColors = GetDataAsDict(process.env.MeshEventTrackNameToColor);
 
     let Report = {
         content: null,

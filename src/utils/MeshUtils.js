@@ -12,6 +12,7 @@ function FormatUrl(Url, Args) {
     });
 }
 
+/* Get the current mesh networked event metadata from the public Fortnite mesh service */
 async function GetMeshNetworkMetadata() {
     let MeshNetworkMetadataUrl = GetMeshNetworkMetadataUrl();
     console.log(MeshNetworkMetadataUrl);
@@ -19,35 +20,19 @@ async function GetMeshNetworkMetadata() {
     return response.data;
 }
 
-async function ParseRealNamesDict() {
+/* This will parse the data (string of [Key][Splitter (typically ':')][Value]) */
+function GetDataAsDict(Data) {
     let Dict = {};
 
-    if(!process.env.MeshEventTrackNameToRealName || process.env.MeshEventTrackNameToRealName == '') {
+    if(!Data || Data == '') {
         return Dict;
     }
 
-    let MeshNetworkdEventsTrackedRealNames = process.env.MeshEventTrackNameToRealName.split(',');
-    for(let TrackedRealName of MeshNetworkdEventsTrackedRealNames) {
-        let MeshEventId = TrackedRealName.split(":")[0];
-        let RealName = TrackedRealName.split(":")[1];
-        Dict[MeshEventId] = RealName;
-    }
-
-    return Dict;
-}
-
-async function ParseColorsDict() {
-    let Dict = {};
-
-    if(!process.env.MeshEventTrackNameToColor || process.env.MeshEventTrackNameToColor == '') {
-        return Dict;
-    }
-
-    let MeshEventTrackNameToColor = process.env.MeshEventTrackNameToColor.split(',');
-    for(let TrackedRealName of MeshEventTrackNameToColor) {
-        let MeshEventId = TrackedRealName.split(":")[0];
-        let Color = TrackedRealName.split(":")[1];
-        Dict[MeshEventId] = parseInt(Color);
+    let DataArray = Data.split(',');
+    for(let Key of DataArray) {
+        let RealKey = Key.split(":")[0];
+        let Value = Key.split(":")[1];
+        Dict[RealKey] = Value;
     }
 
     return Dict;
@@ -57,6 +42,5 @@ module.exports = {
     GetMeshNetworkMetadataUrl,
     FormatUrl,
     GetMeshNetworkMetadata,
-    ParseRealNamesDict,
-    ParseColorsDict
+    GetDataAsDict
 };

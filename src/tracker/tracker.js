@@ -1,7 +1,5 @@
 let DiscordWebhook = require('../discord/DiscordWebhookSender');
-const { GetMeshNetworkMetadata, GetDataAsDict } = require('../utils/MeshUtils');
-
-let BeforeData = {};
+const { GetMeshNetworkMetadata, GetDataAsDict, SetCurrentMeshData, GetCurrentMeshData } = require('../utils/MeshUtils');
 
 /* Report back to Discord (or whatever else we plug in) about the current mesh data! */
 async function ReportMeshData() {
@@ -9,6 +7,7 @@ async function ReportMeshData() {
     let MeshnetworkedEventsToTrack = process.env.MeshEventsToTrack.split(',');
     let MeshNetworkdEventsTrackedRealNames = GetDataAsDict(process.env.MeshEventTrackNameToRealName);
     let MeshNetworkedEventsTrackedColors = GetDataAsDict(process.env.MeshEventTrackNameToColor);
+    let BeforeData = GetCurrentMeshData();
 
     let Report = {
         content: null,
@@ -50,7 +49,7 @@ async function ReportMeshData() {
         }
     }
 
-    BeforeData = MeshData;
+    SetCurrentMeshData(MeshData);
     DiscordWebhook.SendDiscordWebhook(Report);
 }
 

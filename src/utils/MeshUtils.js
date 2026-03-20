@@ -1,4 +1,7 @@
 const axios = require('axios');
+const { GetValuesFromObject } = require('./MetricUtils');
+
+let CurrentMeshData = {};
 
 function GetMeshNetworkMetadataUrl() {
     return(FormatUrl(process.env.MeshNetworkMetadataURL, [process.env.MeshNetworkIdentifier]))
@@ -37,9 +40,25 @@ function GetDataAsDict(Data) {
     return Dict;
 }
 
+function GetCurrentMeshData() {
+    return CurrentMeshData;
+}
+
+function SetCurrentMeshData(NewMeshData) {
+    CurrentMeshData = NewMeshData;
+    return CurrentMeshData;
+}
+
+function GetMeshMetadataForPrometheus() {
+    return GetValuesFromObject(CurrentMeshData, '');
+}
+
 module.exports = {
     GetMeshNetworkMetadataUrl,
     FormatUrl,
     GetMeshNetworkMetadata,
-    GetDataAsDict
+    GetDataAsDict,
+    GetMeshMetadataForPrometheus,
+    GetCurrentMeshData,
+    SetCurrentMeshData
 };

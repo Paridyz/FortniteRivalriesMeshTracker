@@ -4,10 +4,10 @@ function GetValuesFromObject(object, startingName) {
 
     for(let key of Object.keys(object)) {
         if(Number.isInteger(object[key])) {
-            output += `${startingName}_${key} ${object[key]}\n`
+            output += `${startingName.replace('.', ':')}_${key.replace('.', '-')} ${object[key.replace('.', ':')]}\n`
         }
         else if (typeof object[key] == 'object') {
-            output += GetValuesFromObject(object[key],startingName != '' ? `${startingName}_${key}` : key);
+            output += GetValuesFromObject(object[key],startingName != '' ? `${startingName}_${key.replace('.', ':')}` : key.replace('.', ':'));
         }
     }
     

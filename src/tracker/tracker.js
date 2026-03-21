@@ -4,10 +4,16 @@ const { GetMeshNetworkMetadata, GetDataAsDict, SetCurrentMeshData, GetCurrentMes
 /* Report back to Discord (or whatever else we plug in) about the current mesh data! */
 async function ReportMeshData() {
     let MeshData = await GetMeshNetworkMetadata();
+    let BeforeData = GetCurrentMeshData();
+    
+    /* Skip reporting if the data is exactly the same */
+    if(MeshData == BeforeData) {
+        return;
+    }
+
     let MeshnetworkedEventsToTrack = process.env.MeshEventsToTrack.split(',');
     let MeshNetworkdEventsTrackedRealNames = GetDataAsDict(process.env.MeshEventTrackNameToRealName);
     let MeshNetworkedEventsTrackedColors = GetDataAsDict(process.env.MeshEventTrackNameToColor);
-    let BeforeData = GetCurrentMeshData();
 
     let Report = {
         content: null,

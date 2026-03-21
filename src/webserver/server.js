@@ -33,7 +33,8 @@ fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function 
     return { 
         'Avg': parseInt(perHourAverage),
         'DaysLeft': daysLeft,
-        'Eta': currentDate.toISOString()
+        'Eta': currentDate.toISOString(),
+        'Display': currentDate.toLocaleString()
     };
 });
 

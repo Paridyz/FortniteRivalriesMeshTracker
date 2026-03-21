@@ -5,9 +5,10 @@ const { GetMeshNetworkMetadata, GetDataAsDict, SetCurrentMeshData, GetCurrentMes
 async function ReportMeshData() {
     let MeshData = await GetMeshNetworkMetadata();
     let BeforeData = GetCurrentMeshData();
-    
+
     /* Skip reporting if the data is exactly the same */
-    if(MeshData == BeforeData) {
+    if(JSON.stringify(MeshData) == JSON.stringify(BeforeData)) {
+        console.log("data is exact");
         return;
     }
 

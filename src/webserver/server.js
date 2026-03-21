@@ -3,13 +3,35 @@
    why am i yapping in this code - Paridyz */
 /* This will allow grabbing of our stored mesh networked event data over http in a prometheus format :3 */
 let Fastify = require('fastify');
-const { GetMeshMetadataForPrometheus } = require('../utils/MeshUtils');
+const { GetMeshMetadataForPrometheus, GetMeshNetworkMetadata } = require('../utils/MeshUtils');
 const fastify = Fastify({
   logger: true
 })
 
 fastify.get('/metrics',async function handler (request, reply) {
     return GetMeshMetadataForPrometheus();
+});
+
+/* Get an estimated date of completion for the event */
+fastify.get('/eta/:meshNetworkedEventId/:perHourAverage',async function handler (request, reply) {
+    let { meshNetworkedEventId, perHourAverage } = request.params;
+    let meshNetworkData = await GetMeshNetworkMetadata();
+    let meshNetworkedMetadata = meshNetworkData[meshNetworkedEventId];
+    if(!meshNetworkedMetadata) {
+        reply.status(404);
+        return { 'message': 'Mesh networked event not found.' };
+    }
+
+    let currentDate = new Date();
+    let remainingAmount = meshNetworkedMetadata.metadataStructData.requiredValue - meshNetworkedMetadata.metadataStructData.currentValue;
+    let daysLeft = (remainingAmount / perHourAverage) / 24;
+    currentDate.setDate(currentDate.getDate() + daysLeft);
+
+    return { 
+        'Avg': parseInt(perHourAverage),
+        'DaysLeft': daysLeft,
+        'Eta': currentDate.toISOString()
+    };
 });
 
 async function StartServer() {

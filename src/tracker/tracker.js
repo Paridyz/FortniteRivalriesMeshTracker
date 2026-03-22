@@ -33,7 +33,7 @@ async function ReportMeshData() {
                 fields: [
                     {
                         name: "Current Value",
-                        value: `${MeshEvent.metadataStructData.currentValue.toLocaleString()}`
+                        value: `${MeshEvent.metadataStructData.currentValue.toLocaleString()} (${MeshEvent.metadataStructData.currentValue / MeshEvent.metadataStructData.requiredValue * 100}%)`
                     },
                     {
                         name: "Required Value",

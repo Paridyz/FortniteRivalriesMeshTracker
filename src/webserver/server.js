@@ -78,6 +78,29 @@ fastify.get('/milestones/eta/:meshNetworkedEventId/:prometheusVariableName',asyn
     return milestoneCompletionETAs;
 });
 
+/* Get an estimated date of completion for all milestones */
+fastify.get('/grafana/milestones/eta/:meshNetworkedEventId/:prometheusVariableName',async function handler (request, reply) {
+    let { meshNetworkedEventId, prometheusVariableName } = request.params;
+    let perHourAverage = await GetPerHourAverage(prometheusVariableName);
+    let meshNetworkData = await GetMeshNetworkMetadata();
+    let milestones = GetMeshNetworkedEventMilestones();
+    let meshNetworkedMetadata = meshNetworkData[meshNetworkedEventId];
+    if(!meshNetworkedMetadata) {
+        reply.status(404);
+        return { 'message': 'Mesh networked event not found.' };
+    }
+
+    let milestoneCompletionETAs = {};
+    for(let milestone of milestones) {
+        let etaDate = new Date();
+        let milestoneDaysLeft = ((parseInt(milestone) - meshNetworkedMetadata.metadataStructData.currentValue) / perHourAverage) / 24;
+        etaDate.setDate(etaDate.getDate() + milestoneDaysLeft);
+        milestoneCompletionETAs[milestone] = etaDate.toDateString();
+    }
+
+    return milestoneCompletionETAs;
+});
+
 async function StartServer() {
     await fastify.listen({ port: process.env.SERVER_PORT || 3000, host: '0.0.0.0' });
 }

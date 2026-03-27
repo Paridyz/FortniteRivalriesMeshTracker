@@ -17,7 +17,6 @@ fastify.get('/metrics',async function handler (request, reply) {
 fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function handler (request, reply) {
     let { meshNetworkedEventId, prometheusVariableName } = request.params;
     let perHourAverage = await GetPerHourAverage(prometheusVariableName);
-
     let meshNetworkData = await GetMeshNetworkMetadata();
     let meshNetworkedMetadata = meshNetworkData[meshNetworkedEventId];
     if(!meshNetworkedMetadata) {
@@ -31,7 +30,7 @@ fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function 
     currentDate.setDate(currentDate.getDate() + daysLeft);
 
     return { 
-        'Avg': parseInt(perHourAverage),
+        'Avg': perHourAverage,
         'DaysLeft': daysLeft,
         'Eta': currentDate.toISOString(),
         'Display': currentDate.toDateString()

@@ -30,16 +30,16 @@ fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function 
     let daysLeft = (remainingAmount / perHourAverage) / 24;
     currentDate.setDate(currentDate.getDate() + daysLeft);
 
-    let milestoneCompletionETAs = [];
+    let milestoneCompletionETAs = {};
     for(let milestone of milestones) {
         let etaDate = new Date();
         let milestoneDaysLeft = ((parseInt(milestone) - meshNetworkedMetadata.metadataStructData.currentValue) / perHourAverage) / 24;
         etaDate.setDate(etaDate.getDate() + milestoneDaysLeft);
-        milestoneCompletionETAs.push({
+        milestoneCompletionETAs[milestone] = {
             DaysLeft: milestoneDaysLeft,
             Eta: etaDate.toISOString(),
             Display: etaDate.toDateString(),
-        });
+        };
     }
 
     return { 

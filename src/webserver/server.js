@@ -3,7 +3,7 @@
    why am i yapping in this code - Paridyz */
 /* This will allow grabbing of our stored mesh networked event data over http in a prometheus format :3 */
 let Fastify = require('fastify');
-const { GetMeshMetadataForPrometheus, GetMeshNetworkMetadata } = require('../utils/MeshUtils');
+const { GetMeshMetadataForPrometheus, GetMeshNetworkMetadata, GetMeshNetworkedEventMilestones } = require('../utils/MeshUtils');
 const { GetPerHourAverage } = require('../utils/MetricUtils');
 const fastify = Fastify({
   logger: true
@@ -18,6 +18,7 @@ fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function 
     let { meshNetworkedEventId, prometheusVariableName } = request.params;
     let perHourAverage = await GetPerHourAverage(prometheusVariableName);
     let meshNetworkData = await GetMeshNetworkMetadata();
+    let milestones = GetMeshNetworkedEventMilestones();
     let meshNetworkedMetadata = meshNetworkData[meshNetworkedEventId];
     if(!meshNetworkedMetadata) {
         reply.status(404);
@@ -29,11 +30,24 @@ fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function 
     let daysLeft = (remainingAmount / perHourAverage) / 24;
     currentDate.setDate(currentDate.getDate() + daysLeft);
 
+    let milestoneCompletionETAs = [];
+    for(let milestone of milestones) {
+        let etaDate = new Date();
+        let milestoneDaysLeft = ((parseInt(milestone) - meshNetworkedMetadata.metadataStructData.currentValue) / perHourAverage) / 24;
+        etaDate.setDate(etaDate.getDate() + milestoneDaysLeft);
+        milestoneCompletionETAs.push({
+            DaysLeft: milestoneDaysLeft,
+            Eta: etaDate.toISOString(),
+            Display: etaDate.toDateString(),
+        });
+    }
+
     return { 
-        'Avg': perHourAverage,
-        'DaysLeft': daysLeft,
-        'Eta': currentDate.toISOString(),
-        'Display': currentDate.toDateString()
+        Avg: perHourAverage,
+        DaysLeft: daysLeft,
+        Eta: currentDate.toISOString(),
+        Display: currentDate.toDateString(),
+        Milestones: milestoneCompletionETAs
     };
 });
 

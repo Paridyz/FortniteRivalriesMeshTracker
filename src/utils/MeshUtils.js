@@ -7,6 +7,10 @@ function GetMeshNetworkMetadataUrl() {
     return(FormatUrl(process.env.MeshNetworkMetadataURL, [process.env.MeshNetworkIdentifier]))
 }
 
+function GetMeshNetworkedEventMilestones() {
+    return GetDataArray(process.env.MeshEventMilestones);
+}
+
 function FormatUrl(Url, Args) {
     return Url.replace(/{(\d+)}/g, (match, number) => {
         return typeof Args[number] !== 'undefined' 
@@ -40,6 +44,29 @@ function GetDataAsDict(Data) {
     return Dict;
 }
 
+/* This will parse the data (value array split by ',') */
+function GetDataArray(Data) {
+    return Data.split(',');
+}
+
+/* This will parse the data (string of [Key][Splitter (typically ':')][Array split by '-']) */
+function GetDataDictArray(Data) {
+    let Dict = {};
+
+    if(!Data || Data == '') {
+        return Dict;
+    }
+
+    let DataArray = Data.split(',');
+    for(let Key of DataArray) {
+        let RealKey = Key.split(":")[0];
+        let Value = Key.split(":")[1].split('-');
+        Dict[RealKey] = Value;
+    }
+
+    return Dict;
+}
+
 function GetCurrentMeshData() {
     return CurrentMeshData;
 }
@@ -55,9 +82,12 @@ function GetMeshMetadataForPrometheus() {
 
 module.exports = {
     GetMeshNetworkMetadataUrl,
+    GetMeshNetworkedEventMilestones,
     FormatUrl,
     GetMeshNetworkMetadata,
     GetDataAsDict,
+    GetDataDictArray,
+    GetDataArray,
     GetMeshMetadataForPrometheus,
     GetCurrentMeshData,
     SetCurrentMeshData

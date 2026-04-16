@@ -38,7 +38,7 @@ fastify.get('/eta/:meshNetworkedEventId/:prometheusVariableName',async function 
         milestoneCompletionETAs[milestone] = {
             DaysLeft: milestoneDaysLeft,
             Eta: etaDate.toISOString(),
-            Display: milestoneDaysLeft < 0 ? "Completed" : etaDate.toDateString(),
+            Display: milestoneDaysLeft <= 0 ? "Completed" : etaDate.toDateString(),
         };
     }
 
@@ -71,7 +71,7 @@ fastify.get('/milestones/eta/:meshNetworkedEventId/:prometheusVariableName',asyn
         milestoneCompletionETAs[milestone] = {
             DaysLeft: milestoneDaysLeft,
             Eta: etaDate.toISOString(),
-            Display: milestoneDaysLeft < 0 ? "Completed" : etaDate.toDateString(),
+            Display: milestoneDaysLeft <= 0 ? "Completed" : etaDate.toDateString(),
         };
     }
 
@@ -95,7 +95,7 @@ fastify.get('/grafana/milestones/eta/:meshNetworkedEventId/:prometheusVariableNa
         let etaDate = new Date();
         let milestoneDaysLeft = ((parseInt(milestone) - meshNetworkedMetadata.metadataStructData.currentValue) / perHourAverage) / 24;
         etaDate.setDate(etaDate.getDate() + milestoneDaysLeft);
-        milestoneCompletionETAs[milestone] = milestoneDaysLeft < 0 ? "Completed" : etaDate.toDateString();
+        milestoneCompletionETAs[milestone] = milestoneDaysLeft <= 0 ? "Completed" : etaDate.toDateString();
     }
 
     return milestoneCompletionETAs;

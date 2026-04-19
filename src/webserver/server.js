@@ -101,6 +101,16 @@ fastify.get('/grafana/milestones/eta/:meshNetworkedEventId/:prometheusVariableNa
     return milestoneCompletionETAs;
 });
 
+/* Get an estimated date of completion for all milestones */
+fastify.get('/grafana/average/:prometheusVariableName',async function handler (request, reply) {
+    let { prometheusVariableName } = request.params;
+    let perHourAverage = await GetPerHourAverage(prometheusVariableName);
+
+    return {
+        perHourAverage
+    };
+});
+
 async function StartServer() {
     await fastify.listen({ port: process.env.SERVER_PORT || 3000, host: '0.0.0.0' });
 }

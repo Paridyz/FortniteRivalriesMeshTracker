@@ -18,12 +18,11 @@ let axios = require('axios');
 
 /* Get the current per-hour average of a prometheus variable */
 async function GetPerHourAverage(prometheusVariableName) {
-    let response = await axios.get(`${process.env.PrometheusAPIURL}/api/v1/query?query=avg(rate(${prometheusVariableName}[1h]))&stats=true`).catch((ex) => {
+    let response = await axios.get(`${process.env.PrometheusAPIURL}/api/v1/query?query=${prometheusVariableName}[1h]&stats=true`).catch((ex) => {
         console.log(`Prometheus API error: ${ex}`);
     });
-
-    // Its a string, why tf?
-    return parseInt(response.data.data.result[0].value[1]);
+    
+    return parseInt(response.data.data.result[0].values[response.data.data.result[0].values.length - 1][1]) - parseInt(response.data.data.result[0].values[0][1]);
 }
 
 module.exports = {

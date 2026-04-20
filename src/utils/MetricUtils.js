@@ -18,11 +18,15 @@ let axios = require('axios');
 
 /* Get the current per-hour average of a prometheus variable */
 async function GetPerHourAverage(prometheusVariableName) {
-    let response = await axios.get(`${process.env.PrometheusAPIURL}/api/v1/query?query=${prometheusVariableName}[1h]&stats=true`).catch((ex) => {
+    let timeRange = 24; // Number in hours. - Paridyz
+
+    let response = await axios.get(`${process.env.PrometheusAPIURL}/api/v1/query?query=${prometheusVariableName}[${timeRange}h]&stats=true`).catch((ex) => {
         console.log(`Prometheus API error: ${ex}`);
     });
     
-    return parseInt(response.data.data.result[0].values[response.data.data.result[0].values.length - 1][1]) - parseInt(response.data.data.result[0].values[0][1]);
+    let result = response.data.data.result[0];
+
+    return Math.floor((parseInt(result.values[result.values.length - 1][1]) - parseInt(result.values[0][1])) / timeRange);
 }
 
 module.exports = {

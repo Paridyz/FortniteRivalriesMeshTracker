@@ -6,13 +6,23 @@ async function ReportMeshData() {
     let MeshData = await GetMeshNetworkMetadata();
     let BeforeData = GetCurrentMeshData();
 
+    let MeshnetworkedEventsToTrack = process.env.MeshEventsToTrack.split(',');
+
+    for(let TrackedMeshEventName of MeshnetworkedEventsToTrack) {
+        if(!BeforeData[TrackedMeshEventName] || !MeshData[TrackedMeshEventName]) { continue; }
+
+        if(MeshData[TrackedMeshEventName].metadataStructData.currentValue < BeforeData[TrackedMeshEventName].metadataStructData.currentValue) {
+            console.log("data is lower");
+            return;
+        }
+    }
+
     /* Skip reporting if the data is exactly the same */
     if(JSON.stringify(MeshData) == JSON.stringify(BeforeData)) {
         console.log("data is exact");
         return;
     }
 
-    let MeshnetworkedEventsToTrack = process.env.MeshEventsToTrack.split(',');
     let MeshNetworkdEventsTrackedRealNames = GetDataAsDict(process.env.MeshEventTrackNameToRealName);
     let MeshNetworkedEventsTrackedColors = GetDataAsDict(process.env.MeshEventTrackNameToColor);
 
@@ -33,7 +43,7 @@ async function ReportMeshData() {
                 fields: [
                     {
                         name: "Current Value",
-                        value: `${MeshEvent.metadataStructData.currentValue.toLocaleString()} (${MeshEvent.metadataStructData.currentValue / MeshEvent.metadataStructData.requiredValue * 100}%)`
+                        value: `${MeshEvent.metadataStructData.currentValue.toLocaleString()} (${Math.floor(MeshEvent.metadataStructData.currentValue / MeshEvent.metadataStructData.requiredValue * 100)}%)`
                     },
                     {
                         name: "Required Value",

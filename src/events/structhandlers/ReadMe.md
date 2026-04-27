@@ -1,0 +1,1 @@
+# This folder contains structs as JS file names that have unique handling for different mesh networked event structures.

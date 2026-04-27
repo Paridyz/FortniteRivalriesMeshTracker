@@ -1,4 +1,6 @@
 let DiscordWebhook = require('../discord/DiscordWebhookSender');
+const fs = require('fs');
+let path = require('path');
 const { GetMeshNetworkMetadata, GetDataAsDict, SetCurrentMeshData, GetCurrentMeshData } = require('../utils/MeshUtils');
 
 /* Report back to Discord (or whatever else we plug in) about the current mesh data! */
@@ -7,15 +9,6 @@ async function ReportMeshData() {
     let BeforeData = GetCurrentMeshData();
 
     let MeshnetworkedEventsToTrack = process.env.MeshEventsToTrack.split(',');
-
-    for(let TrackedMeshEventName of MeshnetworkedEventsToTrack) {
-        if(!BeforeData[TrackedMeshEventName] || !MeshData[TrackedMeshEventName]) { continue; }
-
-        if(MeshData[TrackedMeshEventName].metadataStructData.currentValue < BeforeData[TrackedMeshEventName].metadataStructData.currentValue) {
-            console.log("data is lower");
-            return;
-        }
-    }
 
     /* Skip reporting if the data is exactly the same */
     if(JSON.stringify(MeshData) == JSON.stringify(BeforeData)) {
@@ -27,39 +20,35 @@ async function ReportMeshData() {
     let MeshNetworkedEventsTrackedColors = GetDataAsDict(process.env.MeshEventTrackNameToColor);
 
     let Report = {
-        content: null,
-        embeds: [],
-        attachments: []
+        content: '',
+        embeds: []
     };
 
     for(let TrackedMeshEventName of MeshnetworkedEventsToTrack) {
+
         let MeshEvent = MeshData[TrackedMeshEventName];
 
         if(MeshEvent) {
-            Report.embeds.push({
-                title: TrackedMeshEventName,
-                description: `**${MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] ? MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] : TrackedMeshEventName}**`,
-                color: MeshNetworkedEventsTrackedColors[TrackedMeshEventName] ? MeshNetworkedEventsTrackedColors[TrackedMeshEventName] : 4522140,
-                fields: [
-                    {
-                        name: "Current Value",
-                        value: `${MeshEvent.metadataStructData.currentValue.toLocaleString()} (${Math.floor(MeshEvent.metadataStructData.currentValue / MeshEvent.metadataStructData.requiredValue * 100)}%)`
-                    },
-                    {
-                        name: "Required Value",
-                        value: `${MeshEvent.metadataStructData.requiredValue.toLocaleString()}`
-                    },
-                    {
-                        name: "bHasCompleted",
-                        value: `${MeshEvent.metadataStructData.bHasCompleted}`
-                    }
-                ]
-            });
+            let EventStructHandlerPath = path.join(__dirname, '..', 'events', 'structhandlers', `${MeshEvent.metadataStructName}.js`);
+            if(!fs.existsSync(EventStructHandlerPath)) {
+                console.log(`Event struct ${MeshEvent.metadataStructName} is not currently supported.`);
+                continue;
+            }
+
+            let EventStructHandler = require(EventStructHandlerPath);
+
+            let PreviousMeshEvent = BeforeData[TrackedMeshEventName];
+            if(PreviousMeshEvent && EventStructHandler.isEventComplete(PreviousMeshEvent)) {
+                continue;
+            }
+
+            Report.embeds.push(EventStructHandler.createWebhookBody(TrackedMeshEventName, 
+                MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] ? MeshNetworkdEventsTrackedRealNames[TrackedMeshEventName] : TrackedMeshEventName, 
+                    MeshNetworkedEventsTrackedColors[TrackedMeshEventName] ? parseInt(MeshNetworkedEventsTrackedColors[TrackedMeshEventName]) : 4522140, MeshEvent));
 
             /* Check if we've newly completed this event */
-            let PreviousMeshEvent = BeforeData[TrackedMeshEventName];
             if(PreviousMeshEvent) {
-                if(PreviousMeshEvent.metadataStructData.bHasCompleted != MeshEvent.metadataStructData.bHasCompleted && MeshEvent.metadataStructData.bHasCompleted == true) {
+                if(EventStructHandler.isEventComplete(PreviousMeshEvent) != EventStructHandler.isEventComplete(MeshEvent) && EventStructHandler.isEventComplete(MeshEvent) == true) {
                     Report.content = `<@&${process.env.PingRoleId}>`;
                 }
             }
